@@ -1,0 +1,225 @@
+public class QueueTest {
+
+    public static void main(String[] args) {
+        testLinkedListQueue();
+        testArrayQueue();
+        testDynamicQueue();
+    }
+
+    private static void testLinkedListQueue() {
+        System.out.println("Testing LinkedListQueue:");
+        LinkedListQueue linkedListQueue = new LinkedListQueue();
+
+        long startTime = System.nanoTime();
+        linkedListQueue.add(1);
+        linkedListQueue.add(2);
+        linkedListQueue.add(3);
+        long endTime = System.nanoTime();
+
+        System.out.println("Add operations took: " + (endTime - startTime) + " ns");
+        
+        startTime = System.nanoTime();
+        System.out.println(linkedListQueue.remove()); // 1
+        System.out.println(linkedListQueue.remove()); // 2
+        System.out.println(linkedListQueue.remove()); // 3
+        endTime = System.nanoTime();
+
+        System.out.println("Remove operations took: " + (endTime - startTime) + " ns");
+        System.out.println();
+    }
+
+    private static void testArrayQueue() {
+        System.out.println("Testing ArrayQueue:");
+        ArrayQueue arrayQueue = new ArrayQueue(4);
+
+        long startTime = System.nanoTime();
+        arrayQueue.add(1);
+        arrayQueue.add(2);
+        arrayQueue.add(3);
+        long endTime = System.nanoTime();
+
+        System.out.println("Add operations took: " + (endTime - startTime) + " ns");
+
+        startTime = System.nanoTime();
+        System.out.println(arrayQueue.remove()); // 1
+        System.out.println(arrayQueue.remove()); // 2
+        System.out.println(arrayQueue.remove()); // 3
+        endTime = System.nanoTime();
+
+        System.out.println("Remove operations took: " + (endTime - startTime) + " ns");
+        System.out.println();
+    }
+
+    private static void testDynamicQueue() {
+        System.out.println("Testing DynamicQueue:");
+        DynamicQueue dynamicQueue = new DynamicQueue(3);
+
+        long startTime = System.nanoTime();
+        dynamicQueue.add(1);
+        dynamicQueue.add(2);
+        dynamicQueue.add(3);
+        dynamicQueue.add(4);
+        long endTime = System.nanoTime();
+
+        System.out.println("Add operations took: " + (endTime - startTime) + " ns");
+
+        startTime = System.nanoTime();
+        System.out.println(dynamicQueue.remove()); // 1
+        System.out.println(dynamicQueue.remove()); // 2
+        System.out.println(dynamicQueue.remove()); // 3
+        System.out.println(dynamicQueue.remove()); // 4
+        endTime = System.nanoTime();
+
+        System.out.println("Remove operations took: " + (endTime - startTime) + " ns");
+        System.out.println();
+    }
+
+    // Implementations of LinkedListQueue, ArrayQueue, and DynamicQueue would be elsewhere in your codebase
+    private static class LinkedListQueue {
+        Node head;
+        Node tail;
+        
+        private class Node {
+            Integer item;
+            Node next;
+            
+            private Node(Integer item) {
+                this.item = item;
+                this.next = null;
+            }
+        }
+        
+        public LinkedListQueue() {
+            this.head = null;
+            this.tail = null;
+        }
+        
+        public void add(Integer item) {
+            Node newNode = new Node(item);
+            if (head == null) {
+                head = newNode;
+                tail = newNode;
+            } else {
+                tail.next = newNode;
+                tail = newNode;
+            }
+        }
+        
+        public Integer remove() {
+            if (head == null) {
+                throw new RuntimeException("Queue is empty");
+            }
+            Integer item = head.item;
+            head = head.next;
+            if (head == null) {
+                tail = null;  // If the last item was removed, update tail to null
+            }
+            return item;
+        }
+    }
+
+    private static class ArrayQueue {
+        private Integer[] arr;
+    private int i; // index for the front of the queue
+    private int k; // index for the rear of the queue
+    private int n; // capacity of the queue
+
+    public ArrayQueue(int capacity) {
+        this.arr = new Integer[capacity];
+        this.i = 0;
+        this.k = 0;
+        this.n = capacity;
+    }
+
+    public void add(Integer item) {
+        if ((k + 1) % n == i) {
+            throw new RuntimeException("Queue is full");
+        }
+        arr[k] = item;
+        k = (k + 1) % n;
+    }
+
+    public Integer remove() {
+        if (i == k) {
+            return null; // queue is empty
+        }
+        Integer item = arr[i];
+        arr[i] = null; // Remove reference to the item
+        i = (i + 1) % n;
+        return item;
+    }
+
+    // You may also want to add additional methods for better usability, such as:
+    public boolean isEmpty() {
+        return i == k;
+    }
+
+    public boolean isFull() {
+        return (k + 1) % n == i;
+    }
+
+    public int size() {
+        if(k >= i) {
+            return k - i;
+        } else {
+            return (k - i + n) % n;
+        }
+    }
+    }
+
+    private static class DynamicQueue {
+        
+    private Integer[] arr;
+    private int i; // index for the front of the queue
+    private int k; // index for the rear of the queue
+    private int n; // capacity of the queue
+    private int size; // current size of the queue
+
+    public DynamicQueue(int capacity) {
+        this.arr = new Integer[capacity];
+        this.i = 0;
+        this.k = 0;
+        this.n = capacity;
+        this.size = 0;
+    }
+
+    public void add(Integer item) {
+        if ((k + 1) % n == i) {
+            // Resize the array
+            resize(2 * n);
+        }
+        arr[k] = item;
+        k = (k + 1) % n;
+        size++;
+    }
+
+    public Integer remove() {
+        if (size == 0) {
+            return null; // queue is empty
+        }
+        Integer item = arr[i];
+        arr[i] = null;
+        i = (i + 1) % n;
+        size--;
+
+        // Optional: Shrink the array
+        if (size > 0 && size == n / 4) {
+            resize(n / 2);
+        }
+        return item;
+    }
+
+    private void resize(int capacity) {
+        Integer[] copy = new Integer[capacity];
+
+        for (int j = 0; j < size; j++) {
+            copy[j] = arr[(i + j) % n];
+        }
+        
+        arr = copy;
+        n = capacity;
+        i = 0;
+        k = size;
+    }
+    }
+}
