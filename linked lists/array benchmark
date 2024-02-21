@@ -1,0 +1,58 @@
+public class ArrayBenchmark {
+    
+    // Append two arrays
+    public static int[] appendArrays(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int fixedSize = 1000;
+        int[] fixedArray = new int[fixedSize];
+
+        // Varying size of array a and appending to a fixed size array b
+        for (int n = 100; n <= 1000; n += 100) {
+            int[] arrayA = new int[n];
+            long startTime = System.nanoTime();
+            appendArrays(arrayA, fixedArray);
+            long endTime = System.nanoTime();
+            System.out.println("Appending array of size " + n + " to fixed array: " + (endTime - startTime) + " ns");
+        }
+
+        System.out.println("-------------------");
+
+        // Varying size of array b and appending a fixed size array a to it
+        int[] fixedArrayA = new int[100];
+        for (int n = 100; n <= 1000; n += 100) {
+            int[] arrayB = new int[n];
+            long startTime = System.nanoTime();
+            appendArrays(fixedArrayA, arrayB);
+            long endTime = System.nanoTime();
+            System.out.println("Appending fixed array to an array of size " + n + ": " + (endTime - startTime) + " ns");
+        }
+
+        benchmarkBuildingListAndArray();
+    }
+
+    public static void benchmarkBuildingListAndArray() {
+        for (int n = 1000; n <= 10000; n += 1000) {
+            // Benchmark for LinkedList
+            long startTimeLinkedList = System.nanoTime();
+            LinkedList list = new LinkedList(n);
+            long endTimeLinkedList = System.nanoTime();
+
+            // Benchmark for Array
+            long startTimeArray = System.nanoTime();
+            int[] array = new int[n];
+            long endTimeArray = System.nanoTime();
+
+            System.out.println("Building LinkedList of size " + n + ": " + (endTimeLinkedList - startTimeLinkedList) + " ns");
+            System.out.println("Allocating array of size " + n + ": " + (endTimeArray - startTimeArray) + " ns");
+            System.out.println("-------------------");
+        }
+    }
+
+    
+}
