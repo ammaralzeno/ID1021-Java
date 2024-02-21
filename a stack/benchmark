@@ -1,0 +1,75 @@
+public class Benchmark {
+
+
+    public static void main(String[] args) {
+        int numRuns = 1000; // Number of runs
+        int numOperations = 3200; // Number of push and pop operations per run
+
+        // Arrays to store execution times for each run
+        long[] staticTimes = new long[numRuns];
+        long[] dynamicTimes = new long[numRuns];
+
+        for (int run = 0; run < numRuns; run++) {
+            // Create stacks for benchmarking
+            DynamicStack Dstack = new DynamicStack();
+            FixedSizeStack Sstack = new FixedSizeStack(3201);
+
+            // Benchmarking push operations for the FixedSizeStack
+            long StaticStart = System.nanoTime();
+            for (int i = 0; i < numOperations; i++) {
+                Sstack.push(i);
+            }
+            
+            // Benchmarking pop operations for the FixedSizeStack
+            for (int i = 0; i < numOperations; i++) {
+                Sstack.pop();
+            }
+            long StaticEnd = System.nanoTime();
+            staticTimes[run] = StaticEnd - StaticStart;
+
+            // Benchmarking push operations for the DynamicStack
+            long DynamicStart = System.nanoTime();
+            for (int i = 0; i < numOperations; i++) {
+                Dstack.push(i);
+            }
+            
+            // Benchmarking pop operations for the DynamicStack
+            for (int i = 0; i < numOperations; i++) {
+                Dstack.pop();
+            }
+            long DynamicEnd = System.nanoTime();
+            dynamicTimes[run] = DynamicEnd - DynamicStart;
+        }
+
+        // Manual sorting of the arrays to calculate the median
+        staticTimes = bubbleSort(staticTimes);
+        dynamicTimes = bubbleSort(dynamicTimes);
+
+        // Calculate the median execution times
+        long staticMedian = staticTimes[numRuns / 2];
+        long dynamicMedian = dynamicTimes[numRuns / 2];
+
+        // Print the median execution times
+        System.out.println("Median time for pushing and popping (Static): " + staticMedian + " ns");
+        System.out.println("Median time for pushing and popping (Dynamic): " + dynamicMedian + " ns");
+    }
+
+    // Bubble sort implementation for sorting arrays
+    private static long[] bubbleSort(long[] arr) {
+        int n = arr.length;
+        boolean swapped;
+        do {
+            swapped = false;
+            for (int i = 1; i < n; i++) {
+                if (arr[i - 1] > arr[i]) {
+                    // Swap arr[i-1] and arr[i]
+                    long temp = arr[i - 1];
+                    arr[i - 1] = arr[i];
+                    arr[i] = temp;
+                    swapped = true;
+                }
+            }
+        } while (swapped);
+        return arr;
+    }
+}
