@@ -1,0 +1,138 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Node {
+    int value;
+    int size;
+    Node left;
+    Node right;
+
+    public Node(int value) {
+        this.value = value;
+        this.size = 1;
+    }
+}
+
+public class MinHeap {
+    private Node root;
+
+    public void add(int value) {
+        if (root == null) {
+            root = new Node(value);
+        } else {
+            Node current = root;
+            while (true) {
+                current.size++;
+                if (value < current.value) {
+                    int temp = current.value;
+                    current.value = value;
+                    value = temp;
+                }
+                if (current.left == null) {
+                    current.left = new Node(value);
+                    break;
+                } else if (current.right == null) {
+                    current.right = new Node(value);
+                    break;
+                } else {
+                    current = (current.left.size <= current.right.size) ? current.left : current.right;
+                }
+            }
+        }
+    }
+
+public Integer remove() {
+    if (root == null) {
+        return null;
+    }
+
+    int result = root.value;
+
+    // Find the last node
+    Node lastNode = root;
+    List<Node> pathToLastNode = new ArrayList<>();
+    while (lastNode.left != null || lastNode.right != null) {
+        pathToLastNode.add(lastNode);
+        if (lastNode.left == null) {
+            lastNode = lastNode.right;
+        } else if (lastNode.right == null || lastNode.left.size <= lastNode.right.size) {
+            lastNode = lastNode.left;
+        } else {
+            lastNode = lastNode.right;
+        }
+    }
+
+    // If the heap has more than one node, replace the root's value with the last node's value and reheapify.
+    if (lastNode != root) {
+        root.value = lastNode.value;
+
+        // Remove the last node from the heap.
+        if (!pathToLastNode.isEmpty()) {
+            Node parentOfLastNode = pathToLastNode.get(pathToLastNode.size() - 1);
+            if (parentOfLastNode.left == lastNode) {
+                parentOfLastNode.left = null;
+            } else {
+                parentOfLastNode.right = null;
+            }
+        }
+
+        // Reheapify from the root.
+        Node current = root;
+        while (current.left != null || current.right != null) {
+            Node smallerChild;
+            if (current.right == null || (current.left != null && current.left.value < current.right.value)) {
+                smallerChild = current.left;
+            } else {
+                smallerChild = current.right;
+            }
+
+            if (current.value > smallerChild.value) {
+                // Swap values
+                int temp = current.value;
+                current.value = smallerChild.value;
+                smallerChild.value = temp;
+
+                current = smallerChild;
+            } else {
+                break;
+            }
+        }
+    } else {
+        root = null;
+    }
+
+    return result;
+}
+
+    public int push(int incr) {
+        if (root == null) {
+            throw new IllegalStateException("Heap is empty");
+        }
+
+        root.value += incr;
+
+        Node current = root;
+        int depth = 0;
+        while (current.left != null || current.right != null) {
+            Node child;
+            if (current.right == null || (current.left != null && current.left.value <= current.right.value)) {
+                child = current.left;
+            } else {
+                child = current.right;
+            }
+
+            if (current.value > child.value) {
+                int temp = current.value;
+                current.value = child.value;
+                child.value = temp;
+
+                current = child;
+                depth++;
+            } else {
+                break;
+            }
+        }
+
+        return depth;
+    }
+}
