@@ -1,0 +1,78 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class Zip6 {
+    Node[] data;
+
+    public static class Node {
+        Integer code;
+        String name;
+        Integer pop;
+
+        public Node(Integer code, String name, Integer pop) {
+            this.code = code;
+            this.name = name;
+            this.pop = pop;
+        }
+    }
+
+    public Zip6(String file, int arraySize) {
+        data = new Node[arraySize];
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] row = line.split(",");
+                Integer code = Integer.valueOf(row[0].replaceAll("\\s", ""));
+                Node node = new Node(code, row[1], Integer.valueOf(row[2]));
+                insert(node);
+            }
+        } catch (Exception e) {
+            System.out.println("File " + file + " not found");
+            e.printStackTrace();
+        }
+    }
+
+    private void insert(Node node) {
+        int index = node.code % data.length;
+        while (data[index] != null) {
+            index = (index + 1) % data.length;
+        }
+        data[index] = node;
+    }
+
+    public Node lookup(String zip) {
+        try {
+            Integer code = Integer.valueOf(zip.replaceAll("\\s", ""));
+            int index = code % data.length;
+            int checks = 0; // count how many nodes are checked
+            while (data[index] != null && checks <= data.length) {
+                if (data[index].code.equals(code)) {
+                    System.out.println("Found after " + checks + " checks.");
+                    return data[index];
+                }
+                index = (index + 1) % data.length;
+                checks++;
+            }
+            System.out.println("Not found after " + checks + " checks.");
+            return null;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        // Modifying array size to test lookup efficiency with different load factor
+        int arraySize = 20000; // Modify this value as per your experiment
+        String absolutePath = "/Users/ammaralzeno/Downloads/postnummer.csv";
+        Zip6 zipData = new Zip6("/Users/ammaralzeno/Downloads/postnummer.csv", arraySize);
+
+
+        Node node = zipData.lookup("98495");
+        if (node != null) {
+            System.out.println("Lookup: Found - Code: " + node.code + ", Name: " + node.name + ", Population: " + node.pop);
+        } else {
+            System.out.println("Lookup: Zip code 11115 not found.");
+        }
+    }
+}
