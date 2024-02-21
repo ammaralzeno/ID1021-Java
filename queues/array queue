@@ -1,0 +1,48 @@
+public class QueuesArr {
+    private Integer[] arr;
+    private int i; // index for the front of the queue
+    private int k; // index for the rear of the queue
+    private int n; // capacity of the queue
+
+    public QueuesArr(int capacity) {
+        this.arr = new Integer[capacity];
+        this.i = 0;
+        this.k = 0;
+        this.n = capacity;
+    }
+
+    public void add(Integer item) {
+        if ((k + 1) % n == i) {
+            throw new RuntimeException("Queue is full");
+        }
+        arr[k] = item;
+        k = (k + 1) % n;
+    }
+
+    public Integer remove() {
+        if (i == k) {
+            return null; // queue is empty
+        }
+        Integer item = arr[i];
+        arr[i] = null; // Remove reference to the item
+        i = (i + 1) % n;
+        return item;
+    }
+
+    // You may also want to add additional methods for better usability, such as:
+    public boolean isEmpty() {
+        return i == k;
+    }
+
+    public boolean isFull() {
+        return (k + 1) % n == i;
+    }
+
+    public int size() {
+        if(k >= i) {
+            return k - i;
+        } else {
+            return (k - i + n) % n;
+        }
+    }
+}
