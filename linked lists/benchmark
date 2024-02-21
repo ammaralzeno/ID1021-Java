@@ -1,0 +1,78 @@
+public class Benchmark {
+    
+    // Array Functions
+    public static int[] createArray(int n) {
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            arr[i] = i;
+        }
+        return arr;
+    }
+
+    public static int[] appendArrays(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
+    }
+
+    // Benchmarks
+    public static void benchmarkArrayAppend() {
+        final int FIXED_SIZE = 1000;
+        final int MAX_VARIABLE_SIZE = 10000;
+        final int STEP_SIZE = 500;
+
+        System.out.println("Varying size of array 'a', fixed size of array 'b':");
+        for (int i = STEP_SIZE; i <= MAX_VARIABLE_SIZE; i += STEP_SIZE) {
+            int[] a = createArray(i);
+            int[] b = createArray(FIXED_SIZE);
+            long start = System.nanoTime();
+            appendArrays(a, b);
+            long end = System.nanoTime();
+            System.out.println("Size of a: " + i + ", Time: " + (end - start) + " ns");
+        }
+
+        System.out.println("\nVarying size of array 'b', fixed size of array 'a':");
+        for (int i = STEP_SIZE; i <= MAX_VARIABLE_SIZE; i += STEP_SIZE) {
+            int[] a = createArray(FIXED_SIZE);
+            int[] b = createArray(i);
+            long start = System.nanoTime();
+            appendArrays(a, b);
+            long end = System.nanoTime();
+            System.out.println("Size of b: " + i + ", Time: " + (end - start) + " ns");
+        }
+    }
+
+    public static void benchmarkLinkedListBuilding() {
+        final int MAX_SIZE = 10000;
+        final int STEP_SIZE = 500;
+
+        System.out.println("\nTime to build LinkedList of varying sizes:");
+        for (int i = STEP_SIZE; i <= MAX_SIZE; i += STEP_SIZE) {
+            long start = System.nanoTime();
+            LinkedList list = new LinkedList(i);
+            long end = System.nanoTime();
+            System.out.println("Size of list: " + i + ", Time: " + (end - start) + " ns");
+        }
+    }
+
+    public static void benchmarkArrayAllocation() {
+        final int MAX_SIZE = 10000;
+        final int STEP_SIZE = 500;
+
+        System.out.println("\nTime to allocate array of varying sizes:");
+        for (int i = STEP_SIZE; i <= MAX_SIZE; i += STEP_SIZE) {
+            long start = System.nanoTime();
+            int[] arr = new int[i];
+            long end = System.nanoTime();
+            System.out.println("Size of array: " + i + ", Time: " + (end - start) + " ns");
+        }
+    }
+
+    // Main Method to run the benchmarks
+    public static void main(String[] args) {
+        benchmarkArrayAppend();
+        benchmarkLinkedListBuilding();
+        benchmarkArrayAllocation();
+    }
+}
