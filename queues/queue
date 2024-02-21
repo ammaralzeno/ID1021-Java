@@ -1,0 +1,42 @@
+public class Queue {
+    Node head;
+    Node tail;
+    
+    private class Node {
+        Integer item;
+        Node next;
+        
+        private Node(Integer item) {
+            this.item = item;
+            this.next = null;
+        }
+    }
+    
+    public Queue() {
+        this.head = null;
+        this.tail = null;
+    }
+    
+    public void add(Integer item) {
+        Node newNode = new Node(item);
+        if (head == null) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            tail.next = newNode;
+            tail = newNode;
+        }
+    }
+    
+    public Integer remove() {
+        if (head == null) {
+            throw new RuntimeException("Queue is empty");
+        }
+        Integer item = head.item;
+        head = head.next;
+        if (head == null) {
+            tail = null;  // If the last item was removed, update tail to null
+        }
+        return item;
+    }
+}
