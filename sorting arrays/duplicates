@@ -1,0 +1,209 @@
+import java.util.Random;
+import java.util.Arrays;
+
+public class Duplicates {
+ 
+ 
+
+private static int[] generateUnsortedArray(int n, int minValue, int maxValue) {
+    Random rnd = new Random();
+    int[] array = new int[n];
+
+    for (int i = 0; i < n; i++) {
+        int randomValue = rnd.nextInt(maxValue - minValue + 1) + minValue;
+
+        // Check for duplicates in the generated array
+        boolean isDuplicate = false;
+        for (int j = 0; j < i; j++) {
+            if (array[j] == randomValue) {
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        if (isDuplicate) {
+            i--; // Decrement i to retry generating a unique value
+        } else {
+            array[i] = randomValue;
+        }
+    }
+
+    return array;
+}
+
+    
+    
+    private static int[] sorted(int n) {
+    
+        Random rnd = new Random();
+    
+        int[] array = new int[n];
+    
+        int nxt = 0;
+    
+        for (int i = 0; i < n ; i++) {
+    
+          nxt += rnd.nextInt(10) + 1;
+          array[i] = nxt;
+        }
+        
+        return array;
+      }
+
+
+    public static boolean binary_search(int[] array, int key) {
+
+        int first = 0;
+        int last = array.length - 1;
+      
+        while (first <= last) { // Use a while loop with a termination condition
+            int index = (first + last) / 2; // Calculate the middle index
+      
+            if (array[index] == key) {
+                return true; // Key found, return true
+            } else if (array[index] < key) {
+                first = index + 1; // Adjust 'first' to search the right half
+            } else {
+                last = index - 1; // Adjust 'last' to search the left half
+            }
+        }
+      
+        return false; // Key not found, return false
+      }
+    
+
+    public static int DuplicatesBinary(int[] arr1, int[] arr2){
+
+        int count = 0;
+
+    for (int element : arr1) {
+        if (binary_search(arr2, element)) {
+            count++;
+        }
+    }
+
+    return count;
+    }
+
+
+    
+    
+    
+    
+    public static int DuplicatesBetter(int[] arr1, int[] arr2) {
+
+        // Initialize variables
+        int i = 0; // Index for arr1
+        int j = 0; // Index for arr2
+        int duplicates = 0; // Counter to keep track of duplicates
+    
+        // Continue looping while there are elements in both arrays to compare
+        while (i < arr1.length && j < arr2.length) {
+            // Compare the current elements in both arrays
+            if (arr1[i] == arr2[j]) {
+                duplicates++;
+                // If element is found, move to the next element in both arrays
+                i++;
+                j++;
+            } else if (arr1[i] < arr2[j]) {
+                // If the element in arr1 is smaller, move to the next element in arr1
+                i++;
+            } else {
+                // If the element in arr2 is smaller, move to the next element in arr2
+                j++;
+            }
+        }
+        return duplicates;
+    }
+    
+
+    
+    public static int DuplicatesLinear(int[] arr1, int[] arr2) {
+      int count = 0;
+    
+      for (int i = 0; i < arr1.length; i++) {
+          int element = arr1[i];
+          boolean foundDuplicate = false;
+    
+          for (int j = 0; j < arr2.length; j++) {
+              if (element == arr2[j]) {
+                  foundDuplicate = true;
+                  break; // Once a duplicate is found, exit the inner loop
+              }
+          }
+    
+          if (foundDuplicate) {
+              count++;
+          }
+      }
+    
+      return count;
+    }
+    
+    
+
+    
+        public static void main(String[] args) {
+
+            int numRuns = 1000;
+            long[] binaryTimesUnsorted = new long[numRuns];
+            long[] binaryTimesSorted = new long[numRuns];
+            long[] linearTimesSorted = new long[numRuns];
+            long[] linearTimesUnsorted = new long[numRuns];
+    
+            int[] unsortedArray1 = generateUnsortedArray(1000, 1, 1000);
+            int[] unsortedArray2 = generateUnsortedArray(1000, 1, 1000);
+            int[] sortedArray1 = sorted(1000);
+            int[] sortedArray2 = sorted(1000);
+    
+            for (int i = 0; i < numRuns; i++) {
+               
+                // Benchmark for DuplicatesB on sorted arrays
+                long startDuplicatesBSorted = System.nanoTime();
+                DuplicatesBinary(sortedArray1, sortedArray2);
+                long endDuplicatesBSorted = System.nanoTime();
+                binaryTimesSorted[i] = endDuplicatesBSorted - startDuplicatesBSorted;
+    
+                // Benchmark for DuplicatesL on sorted arrays
+                long startDuplicatesLSorted = System.nanoTime();
+                DuplicatesBinary(sortedArray1, sortedArray2);
+                long endDuplicatesLSorted = System.nanoTime();
+                linearTimesSorted[i] = endDuplicatesLSorted - startDuplicatesLSorted;
+
+                // Benchmark for DuplicatesL on unsorted arrays
+                long startDuplicatesLUnsorted = System.nanoTime();
+                DuplicatesLinear(unsortedArray1, unsortedArray2);
+                long endDuplicatesLUnsorted = System.nanoTime();
+                linearTimesUnsorted[i] = endDuplicatesLUnsorted - startDuplicatesLUnsorted;
+            }
+    
+            Arrays.sort(binaryTimesUnsorted);
+            Arrays.sort(binaryTimesSorted);
+            Arrays.sort(linearTimesSorted);
+            Arrays.sort(linearTimesUnsorted);
+    
+            
+            long medianBinarySorted = binaryTimesSorted[numRuns / 2];
+            long medianLinearSorted = linearTimesSorted[numRuns / 2];
+            long medianLinearUnsorted = linearTimesUnsorted[numRuns / 2];
+            
+    
+            System.out.println("Median time for DuplicatesL (unsorted arrays): " + medianLinearUnsorted + " ns");
+            System.out.println("Median time for DuplicatesBinary (sorted arrays): " + medianBinarySorted + " ns");
+            System.out.println("Median time for DuplicatesBetter (sorted arrays): " + medianLinearSorted + " ns");
+            
+        }
+        
+     
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
