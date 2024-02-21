@@ -1,0 +1,71 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class Zip4 {
+    Integer[] keys;
+    int max;
+
+    public static class Node {
+        Integer code;
+        String name;
+        Integer pop;
+
+        public Node(Integer code, String name, Integer pop) {
+            this.code = code;
+            this.name = name;
+            this.pop = pop;
+        }
+    }
+
+    public Zip4(String file) {
+        keys = new Integer[10000]; // Adjusted size for keys
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int i = 0;
+            while ((line = br.readLine()) != null) {
+                String[] row = line.split(",");
+                Integer code = Integer.valueOf(row[0].replaceAll("\\s", ""));
+                keys[i++] = code; // Storing keys separately
+            }
+            max = i;
+        } catch (Exception e) {
+            System.out.println("File " + file + " not found");
+            e.printStackTrace();
+        }
+    }
+
+    public void collisions(int mod) {
+        int[] data = new int[mod];
+        int[] cols = new int[10];
+        for (int i = 0; i < max; i++) {
+            Integer index = keys[i] % mod;
+            cols[data[index]]++;
+            data[index]++;
+        }
+
+        System.out.print(mod);
+        for (int i = 0; i < 10; i++) {
+            System.out.print("\t" + cols[i]);
+        }
+        System.out.println();
+    }
+
+    
+
+    public static void main(String[] args) {
+        String absolutePath = "/Users/ammaralzeno/Downloads/postnummer.csv";
+
+        
+        Zip4 zipData = new Zip4("/Users/ammaralzeno/Downloads/postnummer.csv");
+     
+
+        
+        int[] modValues = {12345, 13513, 13600, 14000};
+        long start = System.nanoTime();
+        for (int mod : modValues) {
+            zipData.collisions(mod);
+        }
+        long end = System.nanoTime();
+        System.out.println("Hashtable time for 5 values: " + (end - start) + "ns");
+    }
+}
