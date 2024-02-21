@@ -1,0 +1,73 @@
+import java.util.Arrays;
+
+public class MinHeapArray {
+    private int[] heap;
+    private int size;
+
+    public MinHeapArray(int capacity) {
+        heap = new int[capacity];
+        size = 0;
+    }
+
+    public void add(int value) {
+        if (size == heap.length) {
+            heap = Arrays.copyOf(heap, size * 2);
+        }
+        heap[size] = value;
+        size++;
+        bubbleUp(size - 1);
+    }
+
+    public int remove() {
+        if (size == 0) throw new IllegalStateException("Heap is empty");
+
+        int minValue = heap[0];
+        heap[0] = heap[size - 1];
+        size--;
+        sinkDown(0);
+        return minValue;
+    }
+
+    public void incrementRoot(int incr) {
+        if (size == 0) throw new IllegalStateException("Heap is empty");
+
+        heap[0] += incr;
+        sinkDown(0);
+    }
+
+    private void bubbleUp(int index) {
+        while (index > 0) {
+            int parentIndex = (index - 1) / 2;
+            if (heap[index] >= heap[parentIndex]) {
+                break;
+            }
+            swap(index, parentIndex);
+            index = parentIndex;
+        }
+    }
+
+    private void sinkDown(int index) {
+        while (true) {
+            int leftChild = 2 * index + 1;
+            int rightChild = 2 * index + 2;
+
+            if (leftChild >= size) break;
+
+            int smallestChild = leftChild;
+            if (rightChild < size && heap[rightChild] < heap[leftChild]) {
+                smallestChild = rightChild;
+            }
+
+            if (heap[index] <= heap[smallestChild]) break;
+
+            swap(index, smallestChild);
+            index = smallestChild;
+        }
+    }
+
+    private void swap(int i, int j) {
+        int temp = heap[i];
+        heap[i] = heap[j];
+        heap[j] = temp;
+    }
+}
