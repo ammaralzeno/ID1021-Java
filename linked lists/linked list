@@ -1,0 +1,81 @@
+public class LinkedList {
+    private Cell first;
+
+    private class Cell {
+        int head;
+        Cell tail;
+
+        Cell(int val, Cell tl) {
+            head = val;
+            tail = tl;
+        }
+    }
+
+    // Add the item as the first cell in the sequence
+    public void add(int item) {
+        first = new Cell(item, first);
+    }
+
+    // Return the length of the sequence
+    public int length() {
+        int count = 0;
+        for (Cell temp = first; temp != null; temp = temp.tail) {
+            count++;
+        }
+        return count;
+    }
+
+    // Return true or false depending on if the item can be found in the sequence
+    public boolean find(int item) {
+        for (Cell temp = first; temp != null; temp = temp.tail) {
+            if (temp.head == item) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Remove the item if it exists in the sequence
+    public void remove(int item) {
+        if (first == null) return;
+
+        // If the first item is the one to be removed
+        if (first.head == item) {
+            first = first.tail;
+            return;
+        }
+
+        for (Cell temp = first; temp.tail != null; temp = temp.tail) {
+            if (temp.tail.head == item) {
+                temp.tail = temp.tail.tail;
+                return;
+            }
+        }
+    }
+
+    // Append a sequence to the end of a sequence
+    public void append(LinkedList b) {
+        if (first == null) {
+            first = b.first;
+            b.first = null;
+            return;
+        }
+
+        Cell nxt = first;
+        while (nxt.tail != null) {
+            nxt = nxt.tail;
+        }
+
+        nxt.tail = b.first;
+        b.first = null;  // setting the second list to have an empty (null) reference as its first cell
+    }
+
+    public LinkedList(int n) {
+        Cell last = null;
+        for (int i = 0; i < n; i++) {
+            last = new Cell(i, last);
+        }
+        first = last;
+    }
+    
+}
