@@ -1,0 +1,138 @@
+public class Main {
+    public static void main(String[] args) {
+        LinkedListStack stack = new LinkedListStack();
+
+        stack.push(1);
+        stack.push(2);
+        stack.push(3);
+
+        System.out.println("Peek: " + stack.peek());  // should print 3
+
+        System.out.println("Pop: " + stack.pop());   // should print 3
+        System.out.println("Pop: " + stack.pop());   // should print 2
+        System.out.println("Pop: " + stack.pop());   // should print 1
+    }
+}
+
+class LinkedListStack {
+    private LinkedList list;
+
+    public LinkedListStack() {
+        this.list = new LinkedList();
+    }
+
+    public void push(int item) {
+        list.add(item);
+    }
+
+    public int pop() { 
+        if (list.first == null) {
+            throw new IllegalStateException("Stack is empty.");
+        }
+
+        int headValue = list.first.head;
+        list.remove(headValue);
+        return headValue;
+    }
+
+    public int peek() {
+        if (list.first == null) {
+            throw new IllegalStateException("Stack is empty.");
+        }
+
+        return list.first.head;
+    }
+
+    public boolean isEmpty() {
+        return list.first == null;
+    }
+}
+
+class LinkedList {
+    Cell first;
+
+    class Cell {
+        int head;
+        Cell tail;
+
+        Cell(int val, Cell tl) {
+            head = val;
+            tail = tl;
+        }
+    }
+
+    LinkedList() {
+        first = null;
+    }
+
+    LinkedList(int n) {
+        Cell last = null;
+        for (int i = 0; i < n; i++) {
+            last = new Cell(i, last);
+        }
+        first = last;
+    }
+
+    void add(int item) {
+        first = new Cell(item, first);
+    }
+
+    boolean find(int item) {
+        Cell current = first;
+        while (current != null) {
+            if (current.head == item) {
+                return true;
+            }
+            current = current.tail;
+        }
+        return false;
+    }
+
+    void remove(int item) {
+        if (first == null) {
+            return;
+        }
+
+        if (first.head == item) {
+            first = first.tail;
+            return;
+        }
+
+        Cell current = first;
+        while (current.tail != null) {
+            if (current.tail.head == item) {
+                current.tail = current.tail.tail;
+                return;
+            }
+            current = current.tail;
+        }
+    }
+
+    int length() {
+        int length = 0;
+        Cell current = first;
+        while (current != null) {
+            length++;
+            current = current.tail;
+        }
+        return length;
+    }
+
+    public void append(LinkedList b) {
+        if (b.first == null) return;
+
+        Cell next = this.first;
+        if (next == null) {
+            first = b.first;
+            b.first = null;
+            return;
+        }
+
+        while (next.tail != null) {
+            next = next.tail;
+        }
+
+        next.tail = b.first;
+        b.first = null;
+    }
+}
