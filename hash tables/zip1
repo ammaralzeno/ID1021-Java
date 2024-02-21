@@ -1,0 +1,142 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Arrays;
+
+public class Zip {
+    Node[] data;
+    int max;
+    private static final int RUNS = 1000;
+
+    public class Node {
+        String code;
+        String name;
+        Integer pop;
+
+        public Node(String code, String name, Integer pop) {
+            this.code = code;
+            this.name = name;
+            this.pop = pop;
+        }
+    }
+
+    public Zip(String file) {
+        data = new Node[10000];
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            int i = 0;
+            while ((line = br.readLine()) != null) {
+                String[] row = line.split(",");
+                data[i++] = new Node(row[0], row[1], Integer.valueOf(row[2]));
+            }
+            max = i - 1;
+        } catch (Exception e) {
+            System.out.println("File " + file + " not found");
+        }
+    }
+
+    public Node linear(String zip) {
+        for (int i = 0; i <= max; i++) {
+            if (data[i].code.equals(zip)) {
+                return data[i];
+            }
+        }
+        return null; // Not found
+    }
+
+    public Node binary(String zip) {
+        int low = 0;
+        int high = max;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            int result = zip.compareTo(data[mid].code);
+            if (result == 0) {
+                return data[mid];
+            } else if (result > 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return null; // Not found
+    }
+
+
+
+
+    public static void main(String[] args) {
+        String absolutePath = "/Users/ammaralzeno/Downloads/postnummer.csv";
+
+        
+        Zip zipData = new Zip("/Users/ammaralzeno/Downloads/postnummer.csv");
+
+     long[] lookupTimes1 = new long[RUNS];
+        long[] lookupTimes2 = new long[RUNS];
+
+         // Assuming ZipData is a predefined class
+        
+        // Generate lookup times for "46196"
+        for (int i = 0; i < RUNS; i++) {
+            long start1 = System.nanoTime();
+            Node node1 = zipData.linear("46196");
+            long end1 = System.nanoTime();
+            lookupTimes1[i] = end1 - start1;
+        }
+
+        // Generate lookup times for "98499"
+        for (int i = 0; i < RUNS; i++) {
+            long start2 = System.nanoTime();
+            Node node2 = zipData.binary("98499");
+            long end2 = System.nanoTime();
+            lookupTimes2[i] = end2 - start2;
+        }
+
+
+
+        long[] lookupTimes3 = new long[RUNS];
+        long[] lookupTimes4 = new long[RUNS];
+
+         // Assuming ZipData is a predefined class
+        
+        // Generate lookup times for "46196"
+        for (int i = 0; i < RUNS; i++) {
+            long start3 = System.nanoTime();
+            Node node3 = zipData.linear("98499");
+            long end3 = System.nanoTime();
+            lookupTimes3[i] = end3 - start3;
+        }
+
+        // Generate lookup times for "98499"
+        for (int i = 0; i < RUNS; i++) {
+            long start4 = System.nanoTime();
+            Node node4 = zipData.binary("11115");
+            long end4 = System.nanoTime();
+            lookupTimes4[i] = end4 - start4;
+        }
+
+        
+
+        // Calculate and display median lookup time for "46196"
+        Arrays.sort(lookupTimes1);
+        long medianTime1 = (lookupTimes1[RUNS / 2] + lookupTimes1[(RUNS - 1) / 2]) / 2;
+        System.out.println("Median time linear 11115: " + medianTime1 + "ns");
+
+        // Calculate and display median lookup time for "98499"
+        Arrays.sort(lookupTimes2);
+        long medianTime2 = (lookupTimes2[RUNS / 2] + lookupTimes2[(RUNS - 1) / 2]) / 2;
+        System.out.println("Median time binary 98499: " + medianTime2 + "ns");
+
+        // Calculate and display median lookup time for "46196"
+        Arrays.sort(lookupTimes1);
+        long medianTime3 = (lookupTimes3[RUNS / 2] + lookupTimes3[(RUNS - 1) / 2]) / 2;
+        System.out.println("Median time linear 98499: " + medianTime3 + "ns");
+
+        // Calculate and display median lookup time for "98499"
+        Arrays.sort(lookupTimes2);
+        long medianTime4 = (lookupTimes4[RUNS / 2] + lookupTimes4[(RUNS - 1) / 2]) / 2;
+        System.out.println("Median time binary 11115: " + medianTime4 + "ns");
+    
+        
+        
+    }
+}
