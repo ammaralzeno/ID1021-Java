@@ -1,0 +1,90 @@
+import java.util.Arrays;
+
+public class mergesort {
+    
+
+    private static void merge(int[] org, int[] aux, int lo, int mid, int hi) {
+        // copy all items from lo to hi from org to aux
+        for (int k = lo; k <= hi; k++) {
+            aux[k] = org[k];
+        }
+    
+        int i = lo;     // the index in the first part
+        int j = mid + 1; // the index in the second part
+    
+        // for all indices from lo to hi
+        for (int k = lo; k <= hi; k++) {
+            if (i > mid) {
+                // i is greater than mid then
+                // move the j'th item to the org array, update j
+                org[k] = aux[j++];
+            } else if (j > hi) {
+                // j is greater than hi then
+                // move the i'th item to the org array, update i
+                org[k] = aux[i++];
+            } else if (aux[i] < aux[j]) {
+                // the i'th item is smaller than the j'th item
+                // move the i'th item to the org array, update i
+                org[k] = aux[i++];
+            } else {
+                // move the j'th item to the org array, update j
+                org[k] = aux[j++];
+            }
+        }
+    }
+    
+    private static void sort(int[] org, int[] aux, int lo, int hi) {
+        if (lo < hi) {
+            int mid = (lo + hi) / 2;
+            // sort the items from lo to mid
+            sort(org, aux, lo, mid);
+            // sort the items from mid+1 to hi
+            sort(org, aux, mid + 1, hi);
+            // merge the two sections using the additional array
+            merge(org, aux, lo, mid, hi);
+        }
+    }
+    
+ 
+
+    public static void main(String[] args) {
+        final int SIZE = 10000; // Adjust as needed
+        final int RUNS = 1000;
+        long[] runTimes = new long[RUNS];
+        
+        for (int r = 0; r < RUNS; r++) {
+            int[] arr = generateRandomArray(SIZE);
+            int[] aux = new int[arr.length];
+            
+            long startTime = System.nanoTime();
+            sort(arr, aux, 0, arr.length - 1);
+            long endTime = System.nanoTime();
+            
+            runTimes[r] = endTime - startTime;
+        }
+        
+        System.out.println("Median runtime: " + getMedian(runTimes) / 1000000 + " ms ");
+        System.out.println("Median runtime: " + getMedian(runTimes) + " ns ");
+    }
+
+    private static int[] generateRandomArray(int size) {
+        int[] arr = new int[size];
+        for (int i = 0; i < size; i++) {
+            arr[i] = (int) (Math.random() * size);
+        }
+        return arr;
+    }
+
+    private static double getMedian(long[] times) {
+        int n = times.length;
+        Arrays.sort(times);
+        if (n % 2 != 0) {
+            return (double) times[n / 2];
+        }
+        return (double) (times[(n - 1) / 2] + times[n / 2]) / 2.0;
+    }
+    
+    
+}
+
+
