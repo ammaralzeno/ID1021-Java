@@ -1,0 +1,175 @@
+import java.util.Arrays;
+import java.util.Random;
+
+class Node {
+
+    int value;
+    Node next;
+    
+    Node(int value) {
+        this.value = value;
+        this.next = null;
+    }
+}
+
+class LinkedList {
+    Node head;
+    Node tail;
+
+    LinkedList() {
+        this.head = this.tail = null;
+    }
+
+    void addNode(int value) {
+    Node newNode = new Node(value);
+    if (head == null) {
+        head = tail = newNode;
+    } else {
+        if(tail == null) {
+            System.out.println("Tail is null!");
+        }
+        tail.next = newNode;  
+        tail = newNode;
+    }
+}
+
+
+    LinkedList quickSort() {
+    if (head == null || head.next == null) {
+        return this; // list is already sorted
+    }
+
+    LinkedList lessSublist = new LinkedList();
+    LinkedList greaterSublist = new LinkedList();
+    Node pivot = head;
+    Node current = head.next;
+    pivot.next = null;
+
+    // partition
+    while (current != null) {
+        Node nextNode = current.next;
+        current.next = null;
+        if (current.value < pivot.value) {
+            lessSublist.addNode(current);
+        } else {
+            greaterSublist.addNode(current);
+        }
+        current = nextNode;
+    }
+
+    
+    lessSublist = lessSublist.quickSort();
+    greaterSublist = greaterSublist.quickSort();
+
+    // lessSublist + pivot + greaterSublist
+    return concatenate(concatenate(lessSublist, pivot), greaterSublist.head);
+}
+
+    void addNode(Node node) {
+        if (head == null) {
+            head = tail = node;
+        } else {
+            tail.next = node;
+            tail = tail.next;
+        }
+    }
+
+    static LinkedList concatenate(LinkedList list1, Node node) {
+    LinkedList list = new LinkedList();
+    list.head = list1.head;
+    list.tail = list1.tail;
+
+    if (list1.head == null) {
+        list.head = list.tail = node;
+    } else {
+        if(list.tail == null) {
+            System.out.println("list.tail is null!");
+        }
+        else{
+        list.tail.next = node; 
+        list.tail = list.tail.next;
+        }
+    }
+    return list;
+}
+
+    static LinkedList concatenate(LinkedList list1, LinkedList list2) {
+        if (list1.head == null) {
+            return list2;
+        }
+        if (list2.head == null) {
+            return list1;
+        }
+        list1.tail.next = list2.head;
+        list1.tail = list2.tail;
+        return list1;
+    }
+
+    void printList() {
+        Node temp = head;
+        while (temp != null) {
+            System.out.print(temp.value + " ");
+            temp = temp.next;
+        }
+        System.out.println();
+    }
+}
+
+public class QuickSortLinkedList {
+
+    static final int SIZE = 10000;
+    static final int RUNS = 1000;
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+
+        list.addNode(0);
+        list.addNode(1);
+        list.addNode(2);
+        list.addNode(3);
+        list.addNode(4);
+        list.addNode(5);
+        list.addNode(6);
+        list.addNode(7);
+        list.addNode(8);
+
+        System.out.println("Original list:");
+        list.printList();
+
+        LinkedList sortedList = list.quickSort();
+
+        System.out.println("Sorted list:");
+        sortedList.printList();
+
+
+         
+            long[] listDurations = new long[RUNS];
+    
+            for (int run = 0; run < RUNS; run++) {
+                int[] array = new int[SIZE];
+                LinkedList linkedList = new LinkedList();
+                Random random = new Random(run);  
+    
+                for (int i = 0; i < SIZE; i++) {
+                    int value = random.nextInt(SIZE);
+                    array[i] = value;
+                    linkedList.addNode(value);
+                }
+    
+         
+                long startTimeList = System.nanoTime();
+                linkedList.quickSort();
+                long endTimeList = System.nanoTime();
+                listDurations[run] = endTimeList - startTimeList;
+            }
+    
+         
+            Arrays.sort(listDurations);
+    
+        
+            long medianDurationList = listDurations[RUNS / 2];
+    
+  
+            System.out.println("Median time for linked list quick sort: " + medianDurationList + " ns");
+        }
+    }
+
