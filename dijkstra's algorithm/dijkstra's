@@ -1,0 +1,231 @@
+import java.util.*;
+
+// Small structure to represent a connection to a neighbor city
+class Connection {
+    City city;
+    int distance;
+    
+    public Connection(City city, int distance) {
+        this.city = city;
+        this.distance = distance;
+    }
+}
+
+// City class holding its immediate neighbors
+class City {
+    String name;
+    int id;
+    List<Connection> neighbours = new ArrayList<>();
+    
+    public City(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+    
+    public void addNeighbour(City city, int distance) {
+        neighbours.add(new Connection(city, distance));
+    }
+}
+
+// Path class for the priority queue
+class Path implements Comparable<Path> {
+    City city;
+    City prev;
+    int dist;
+    Integer index; // This will be managed by the priority queue class
+    
+    public Path(City city, int dist, City prev) {
+        this.city = city;
+        this.prev = prev;
+        this.dist = dist;
+    }
+    
+    @Override
+    public int compareTo(Path other) {
+        return Integer.compare(this.dist, other.dist);
+    }
+}
+
+// Custom Priority Queue class
+class PathPriorityQueue {
+    private List<Path> paths = new ArrayList<>();
+    private Map<City, Integer> cityToIndexMap = new HashMap<>();
+
+    public PathPriorityQueue() {
+        this.paths = new ArrayList<>();
+        this.cityToIndexMap = new HashMap<>();
+    }
+
+    // Get the path at the top without removing it
+    public Path peek() {
+        if (paths.isEmpty()) {
+            return null;
+        }
+        return paths.get(0);
+    }
+
+    // Get and remove the path at the top
+    public Path poll() {
+        if (paths.isEmpty()) {
+            return null;
+        }
+        Path top = paths.get(0);
+        Path last = paths.remove(paths.size() - 1);
+        
+        if (!paths.isEmpty()) {
+            paths.set(0, last);
+            cityToIndexMap.put(last.city, 0);
+            siftDown(0);
+        }
+        
+        cityToIndexMap.remove(top.city);
+        return top;
+    }
+
+    // Add a new path
+    public void offer(Path path) {
+        paths.add(path);
+        int index = paths.size() - 1;
+        cityToIndexMap.put(path.city, index);
+        siftUp(index);
+    }
+
+    // Update a path if a shorter path is found
+    public void update(Path path) {
+        Integer index = cityToIndexMap.get(path.city);
+        if (index == null) {
+            offer(path);
+            return;
+        }
+        
+        paths.set(index, path);
+        siftUp(index);
+        siftDown(index);
+    }
+
+    public boolean isEmpty() {
+        return paths.isEmpty();
+    }
+
+    private void siftUp(int index) {
+        while (index > 0) {
+            int parentIndex = (index - 1) / 2;
+            if (paths.get(index).compareTo(paths.get(parentIndex)) < 0) {
+                swap(index, parentIndex);
+                index = parentIndex;
+            } else {
+                break;
+            }
+        }
+    }
+
+    private void siftDown(int index) {
+        int leftChild, rightChild, smallest;
+        while ((leftChild = 2 * index + 1) < paths.size()) {
+            rightChild = leftChild + 1;
+            smallest = (rightChild < paths.size() && paths.get(rightChild).compareTo(paths.get(leftChild)) < 0) 
+                        ? rightChild : leftChild;
+
+            if (paths.get(index).compareTo(paths.get(smallest)) > 0) {
+                swap(index, smallest);
+                index = smallest;
+            } else {
+                break;
+            }
+        }
+
+        
+    }
+
+    private void swap(int i, int j) {
+        Path temp = paths.get(i);
+        paths.set(i, paths.get(j));
+        paths.set(j, temp);
+
+        // Update the map accordingly
+        cityToIndexMap.put(paths.get(i).city, i);
+        cityToIndexMap.put(paths.get(j).city, j);
+    }
+
+        public Path getPath(City city) {
+        Integer index = cityToIndexMap.get(city);
+        if (index != null && index < paths.size()) {
+            return paths.get(index);
+        }
+        return null;
+    }
+}
+
+
+// Dijkstra algorithm class
+    public class Dijkstra {
+
+        private List<City> allCities;
+        private City[] done;
+        
+        public Dijkstra(List<City> allCities) {
+            this.allCities = allCities;
+            this.done = new City[allCities.size()];
+        }
+        
+        public List<City> shortestPath(City source, City destination) {
+            PathPriorityQueue queue = new PathPriorityQueue();
+            queue.offer(new Path(source, 0, null));
+            
+            while (!queue.isEmpty()) {
+                Path currentPath = queue.poll();
+                City currentCity = currentPath.city;
+    
+                if (done[currentCity.id] != null) {
+                    continue;
+                }
+                
+                done[currentCity.id] = currentPath.prev;
+    
+                if (currentCity.equals(destination)) {
+                    // We have found the shortest path to our destination.
+                    return constructPath(source, destination);
+                }
+                
+                for (Connection connection : currentCity.neighbours) {
+                    City neighbor = connection.city;
+                    if (done[neighbor.id] == null) {
+                        int newDistance = currentPath.dist + connection.distance;
+                        Path existingPath = queue.getPath(neighbor);
+                        
+                        if (existingPath == null || newDistance < existingPath.dist) {
+                            queue.offer(new Path(neighbor, newDistance, null));
+                        }
+                    }
+                }
+            }
+            
+            return null; // No path exists
+        }
+    
+        private List<City> constructPath(City source, City destination) {
+            List<City> path = new ArrayList<>();
+            for (City at = destination; at != null; at = done[at.id]) {
+                path.add(at);
+            }
+            Collections.reverse(path);
+            return path;
+        }
+    
+    
+
+    
+    public static void main(String[] args) {
+
+        if (args.length < 3) {
+            System.out.println("Usage: DijkstraBenchmark <path_to_csv> <from_city> <to_city>");
+            return;
+        }
+
+        DijkstraBenchmark benchmark = new DijkstraBenchmark(args[0]);
+        long t0 = System.nanoTime();
+        Integer dist = benchmark.shortestPath(args[1], args[2]);
+        long time = (System.nanoTime() - t0) / 1_000;
+        System.out.println("Shortest path: " + dist + " min (" + time + " us)");
+    }
+}
