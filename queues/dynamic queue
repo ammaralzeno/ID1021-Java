@@ -1,0 +1,57 @@
+public class DynamicQueue {
+    
+    private Integer[] arr;
+    private int i; // index for the front of the queue
+    private int k; // index for the rear of the queue
+    private int n; // capacity of the queue
+    private int size; // current size of the queue
+
+    public DynamicQueue(int capacity) {
+        this.arr = new Integer[capacity];
+        this.i = 0;
+        this.k = 0;
+        this.n = capacity;
+        this.size = 0;
+    }
+
+    public void add(Integer item) {
+        if ((k + 1) % n == i) {
+            // Resize the array
+            resize(2 * n);
+        }
+        arr[k] = item;
+        k = (k + 1) % n;
+        size++;
+    }
+
+    public Integer remove() {
+        if (size == 0) {
+            return null; // queue is empty
+        }
+        Integer item = arr[i];
+        arr[i] = null;
+        i = (i + 1) % n;
+        size--;
+
+        // Optional: Shrink the array
+        if (size > 0 && size == n / 4) {
+            resize(n / 2);
+        }
+        return item;
+    }
+
+    private void resize(int capacity) {
+        Integer[] copy = new Integer[capacity];
+
+        for (int j = 0; j < size; j++) {
+            copy[j] = arr[(i + j) % n];
+        }
+        
+        arr = copy;
+        n = capacity;
+        i = 0;
+        k = size;
+    }
+
+    // Additional utility methods can be implemented similarly as before
+}
