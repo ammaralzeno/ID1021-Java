@@ -1,0 +1,58 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+public class Benchmark {
+
+    public static void main(String[] args) {
+        Random rand = new Random();
+        
+        // Results storage
+        List<Long> addMedians = new ArrayList<>();
+        List<Long> lookupMedians = new ArrayList<>();
+        
+        // Test for different data sizes
+        for (int n = 10; n <= 10000; n *= 10) {  // example sizes: 10, 100, 1000, 10000
+            
+            List<Long> addRuntimes = new ArrayList<>();
+            List<Long> lookupRuntimes = new ArrayList<>();
+
+            for (int run = 0; run < 1000; run++) {
+                BinaryTree tree = new BinaryTree();
+                
+                // Benchmarking add method for size n
+                long addStartTime = System.nanoTime();
+                for (int i = 0; i < n; i++) {
+                    Integer key = rand.nextInt(10000);
+                    tree.add(key, key);
+                }
+                long addEndTime = System.nanoTime();
+                addRuntimes.add(addEndTime - addStartTime);
+
+                // Benchmarking lookup method for size n
+                long lookupStartTime = System.nanoTime();
+                for (int i = 0; i < n; i++) {
+                    Integer key = rand.nextInt(10000);
+                    tree.lookup(key);
+                }
+                long lookupEndTime = System.nanoTime();
+                lookupRuntimes.add(lookupEndTime - lookupStartTime);
+            }
+            
+            // Sort runtimes to find the median
+            Collections.sort(addRuntimes);
+            Collections.sort(lookupRuntimes);
+            
+            // Save medians for current size n
+            addMedians.add(addRuntimes.get(500));  // 500th element for median in 0-indexed list of 1000 items
+            lookupMedians.add(lookupRuntimes.get(500));
+            
+            // Print median results for the current size n
+            System.out.println("For n = " + n + ":");
+            System.out.println("Median runtime for add: " + addMedians.get(addMedians.size() - 1) + " nanoseconds");
+            System.out.println("Median runtime for lookup: " + lookupMedians.get(lookupMedians.size() - 1) + " nanoseconds");
+            System.out.println("-----------------------------");
+        }
+    }
+}
