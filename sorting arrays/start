@@ -1,0 +1,182 @@
+import java.util.Arrays;
+import java.util.Random;
+
+public class Start{
+
+
+
+public static int[] generateUnsortedArray(int n, int min, int max) {
+  
+    int[] array = new int[n];
+    Random rand = new Random();
+
+    for (int i = 0; i < n; i++) {
+        // Generate a random integer within the specified range (min to max)
+        array[i] = rand.nextInt((max - min) + 1) + min;
+    }
+
+    return array;
+}
+
+
+private static int[] sorted(int n) {
+
+    Random rnd = new Random();
+
+    int[] array = new int[n];
+
+    int nxt = 0;
+
+    for (int i = 0; i < n ; i++) {
+
+      nxt += rnd.nextInt(10) + 1;
+      array[i] = nxt;
+    }
+    
+    return array;
+  }
+
+
+
+public static boolean search_unsorted(int[] array, int key) {
+
+  for (int index = 0; index < array.length ; index++) {
+
+    if (array[index] == key) {
+      return true;
+} 
+}
+
+  return false;
+}
+
+public static boolean search_sorted(int[] array, int key) {
+  for (int index = 0; index < array.length; index++) {
+      if (array[index] == key) {
+          return true; // Key found, stop the search
+      } else if (array[index] > key) {
+          return false; // Key not found since the array is sorted, and further elements will be greater
+      }
+  }
+  return false; // Key not found
+}
+
+
+public static boolean binary_search(int[] array, int key) {
+
+  int first = 0;
+  int last = array.length - 1;
+
+  while (first <= last) {
+      int index = (first + last) / 2; 
+      // Calculate the middle index
+
+      if (array[index] == key) {
+          return true; // Key found, return true
+      } else if (array[index] < key) {
+          first = index + 1; // Adjust 'first' to search the right half
+      } else {
+          last = index - 1; // Adjust 'last' to search the left half
+      }
+  }
+
+  return false; // Key not found, return false
+}
+
+
+public static int generateKey(int min, int max) {
+
+  if (min > max) {
+      throw new IllegalArgumentException("Min cannot be greater than Max.");
+  }
+
+  Random rand = new Random();
+  return rand.nextInt((max - min) + 1) + min;
+}
+
+
+
+public static void main(String[] args) {
+    
+    int numRuns = 1000;
+    long[] unsortedTimes = new long[numRuns];
+    long[] sortedTimes = new long[numRuns];
+    long[] binaryTimes = new long[numRuns];
+
+    
+
+    for (int i = 0; i < numRuns; i++) {
+        int[] unsortedArray = generateUnsortedArray(1000, 1, 1000);
+        int[] sortedArray = sorted(1000);
+        int key = generateKey(1, 1000);
+
+        // Benchmark for unsorted
+        long startUnsorted = System.nanoTime();
+        search_unsorted(unsortedArray, key);
+        long endUnsorted = System.nanoTime();
+        unsortedTimes[i] = endUnsorted - startUnsorted;
+
+        // Benchmark for sorted (linear search)
+        long startSorted = System.nanoTime();
+        search_sorted(sortedArray, key);
+        long endSorted = System.nanoTime();
+        sortedTimes[i] = endSorted - startSorted;
+
+        // Benchmark for sorted (binary search)
+        long startSorted1 = System.nanoTime();
+        binary_search(sortedArray, key);
+        long endSorted1 = System.nanoTime();
+        binaryTimes[i] = endSorted1 - startSorted1;
+    }
+
+    Arrays.sort(unsortedTimes);
+    Arrays.sort(sortedTimes);
+    Arrays.sort(binaryTimes);
+
+    long medianUnsorted = unsortedTimes[numRuns / 2];
+    long medianSorted = sortedTimes[numRuns / 2];
+    long medianBinary = binaryTimes[numRuns / 2];
+
+    System.out.println("Median time for unsorted array (linear search): " + medianUnsorted + " ns");
+    System.out.println("Median time for sorted array (linear search): " + medianSorted + " ns");
+    System.out.println("Median time for sorted array (binary search): " + medianBinary + " ns");
+
+
+
+
+    
+    /* int loop = 1000;
+	    
+	    int[] array = sorted(1000);
+	    int indx = generateKey(1, 1000);
+
+	    int k = 1000;
+	    
+	    double min = Double.POSITIVE_INFINITY;
+
+	    for (int i = 0; i < k; i++) {
+		  long t0 = System.nanoTime();
+		  binary_search(array, indx);
+		  long t1 = System.nanoTime();
+		  double t = (t1 - t0);
+      
+		if (t < min)
+		    min = t;
+	    }
+
+      System.out.println(min/loop);  */
+    
+}
+
+
+/* conclusion: search_unsorted changes time drastically if key is found/not found
+                searching with binary, same time if key found/not found
+                
+                in search_unsorted, if key is detected early the search stops and so on...*/ 
+
+
+}
+
+
+
+
