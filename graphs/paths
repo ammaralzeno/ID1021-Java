@@ -1,0 +1,55 @@
+public class Paths {
+    City[] path;
+    int sp;
+    java.util.Map<City, Integer> memo = new java.util.HashMap<>();
+
+    public Paths() {
+        path = new City[54];
+        sp = 0;
+    }
+
+    private Integer shortest(City from, City to) {
+        if (memo.containsKey(from)) {
+            return memo.get(from);
+        }
+
+        for (int i = 0; i < sp; i++) {
+            if (path[i] == from)
+                return null;
+        }
+
+        if (from == to) {
+            return 0;
+        }
+
+        path[sp++] = from;
+        Integer shrt = null;
+
+        for (Connection conn : from.getConnections()) {
+            Integer dist = shortest(conn.getCity(), to);
+            if (dist != null) {
+                int totalDist = conn.getDistance() + dist;
+                if (shrt == null || totalDist < shrt) {
+                    shrt = totalDist;
+                }
+            }
+        }
+
+        path[sp--] = null;
+        if (shrt != null) {
+            memo.put(from, shrt);
+        }
+        return shrt;
+    }
+
+    public static void main(String[] args) {
+        Map map = new Map("/Users/ammaralzeno/Downloads/trains.csv");
+        String from = args[0];
+        String to = args[1];
+        Paths paths = new Paths();
+        long t0 = System.nanoTime();
+        Integer dist = paths.shortest(map.lookup(from), map.lookup(to));
+        long time = (System.nanoTime() - t0) / 1_000;
+        System.out.println("shortest: " + dist + " min (" + time + " us)");
+    }
+}
